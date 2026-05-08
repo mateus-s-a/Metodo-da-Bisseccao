@@ -19,58 +19,65 @@ def f(R):
     
     return termo_exponencial * math.cos(frequencia * T) - ALVO
 
-def resolver_bisseccao(a, b):
+def resolver_bisseccao(a, b, es):
     """
     Núcleo do algoritmo do Método da Bissecção (Issue #1).
-    Implementa a divisão do intervalo e a lógica de substituição.
+    [ISSUE #2] - Implementa cálculo de erro e formatação de tabela.
     """
     # TODO: Jeanderson (Issue #3) - Validar se f(a) * f(b) < 0 antes de iniciar.
     
-    print("-" * 40)
-    print("Iniciando iterações da Issue #1...")
-    # TODO: Rayssa (Issue #2) - Adicionar cabeçalho da tabela formatada.
-    print("-" * 40)
+    print("\n" + "="*85)
+    print(f"{'Iter':<5} | {'a':<12} | {'b':<12} | {'p':<12} | {'f(p)':<12} | {'Erro (%)':<10}")
+    print("-" * 85)
 
-    # Laço de repetição principal para refinamento da raiz
+    p_velho = None
+    iteracao = 1
+
     # TODO: Jeanderson (Issue #3) - Substituir por loop for i in range(N0).
     while True:
         # 1. Cálculo do ponto médio (Issue #1)
         p = (a + b) / 2
         fp = f(p)
         
-        # TODO: Rayssa (Issue #2) - Calcular Erro Relativo Percentual Aproximado.
-        # TODO: Rayssa (Issue #2) - Imprimir linha da tabela formatada.
+        # 2. Cálculo do Erro Relativo Percentual Aproximado (Issue #2)
+        ea = 0
+        erro_str = "---"
+        if p_velho is not None:
+            ea = abs((p - p_velho) / p) * 100
+            erro_str = f"{ea:.6f}%"
 
-        print(f"Ponto médio (p): {p:.4f} | f(p): {fp:.6f}")
+        # 3. Impressão da linha da tabela formatada (Issue #2)
+        print(f"{iteracao:<5} | {a:<12.6f} | {b:<12.6f} | {p:<12.6f} | {fp:<12.6f} | {erro_str:<10}")
 
-        # 2. Lógica de substituição de extremidades (Issue #1)
-        # Se f(a) e f(p) têm o mesmo sinal, a raiz está no subintervalo [p, b]
+        # 4. Critério de Parada por Erro (Issue #2)
+        if p_velho is not None and ea < es:
+            print("-" * 85)
+            print(f"Critério de parada atingido: Ea ({ea:.6f}%) < Es ({es:.6f}%)")
+            break
+
+        # 5. Lógica de substituição de extremidades (Issue #1)
         if f(a) * fp > 0:
             a = p
         else:
             b = p
         
-        # TODO: Rayssa (Issue #2) - Verificar se Erro < Es para interromper.
-        
-        # Controle manual temporário enquanto a Issue #2 (Critérios de Parada)
-        # e a Issue #3 (Segurança/N0) não são integradas ao núcleo.
-        continuar = input("\nRealizar próxima iteração? (s/n): ")
-        if continuar.lower() != 's':
-            break
+        p_velho = p
+        iteracao += 1
             
     return p
 
 if __name__ == "__main__":
     print("TRABALHO DE CÁLCULO NUMÉRICO - IFMT")
-    print("DESENVOLVIMENTO: ISSUE #1 (NÚCLEO DO ALGORITMO)\n")
+    print("INTEGRAÇÃO: ISSUE #1 (NÚCLEO) + ISSUE #2 (ERRO E TABELA)\n")
     
-    # Entradas básicas para teste da lógica
+    # Entradas de dados
     # TODO: Jeanderson (Issue #3) - Solicitar N0 (Máximo de iterações).
-    # TODO: Rayssa (Issue #2) - Solicitar Es (Tolerância do Erro).
-    
     limite_a = float(input("Digite o limite inferior (a): "))
     limite_b = float(input("Digite o limite superior (b): "))
+    tolerancia_es = float(input("Digite a tolerância desejada (Es %): "))
     
-    resultado = resolver_bisseccao(limite_a, limite_b)
+    resultado = resolver_bisseccao(limite_a, limite_b, tolerancia_es)
     
-    print(f"\nÚltima estimativa calculada para R: {resultado:.4f} Ohms")
+    print("=" * 85)
+    print(f"Resultado final aproximado para R: {resultado:.6f} Ohms")
+    print("=" * 85)
