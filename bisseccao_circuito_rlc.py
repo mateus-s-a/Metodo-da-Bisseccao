@@ -21,51 +21,63 @@ def f(R):
 
 def resolver_bisseccao(a, b, es, n0):
     """
-    Núcleo do algoritmo do Método da Bissecção (Issue #1).
-    [ISSUE #2] - Implementa cálculo de erro e formatação de tabela.
-    [ISSUE #3] - Implementa validação de sinal e limite de iterações (N0).
+    Núcleo do algoritmo do Método da Bissecção.
+    [ISSUE #4] - Agora grava os resultados automaticamente em resultados_tabela.txt.
     """
-    # 1. Validação de Segurança Inicial (Issue #3)
+    # 1. Validação de Segurança Inicial
     fa = f(a)
     fb = f(b)
     
     if fa * fb >= 0:
-        print("\n" + "!"*85)
-        print(f"ERRO DE ENTRADA: f({a}) * f({b}) = {fa*fb:.6f}")
-        print("O Método da Bissecção requer que a função mude de sinal no intervalo [a, b].")
-        print("Tente um intervalo diferente onde f(a) * f(b) < 0.")
-        print("!"*85)
+        msg_erro = (
+            "\n" + "!"*85 + "\n" +
+            f"ERRO DE ENTRADA: f({a}) * f({b}) = {fa*fb:.6f}\n" +
+            "O Método da Bissecção requer que a função mude de sinal no intervalo [a, b].\n" +
+            "Tente um intervalo diferente onde f(a) * f(b) < 0.\n" +
+            "!"*85 + "\n"
+        )
+        print(msg_erro)
         return None
     
-    print("\n" + "="*85)
-    print(f"{'Iter':<5} | {'a':<12} | {'b':<12} | {'p':<12} | {'f(p)':<12} | {'Erro (%)':<10}")
-    print("-" * 85)
+    # Preparação para gravação em arquivo (Issue #4)
+    linhas_log = []
+    
+    cabecalho_tab = "\n" + "="*85 + "\n"
+    cabecalho_tab += f"{'Iter':<5} | {'a':<12} | {'b':<12} | {'p':<12} | {'f(p)':<12} | {'Erro (%)':<10}\n"
+    cabecalho_tab += "-" * 85
+    
+    print(cabecalho_tab)
+    linhas_log.append(cabecalho_tab)
 
     p_velho = None
 
-    # 2. Laço de repetição com trava de segurança N0 (Issue #3)
+    # 2. Laço de repetição com trava de segurança N0
     for iteracao in range(1, n0 + 1):
-        # Cálculo do ponto médio (Issue #1)
         p = (a + b) / 2
         fp = f(p)
         
-        # Cálculo do Erro Relativo (Issue #2)
         ea = 0
         erro_str = "---"
         if p_velho is not None:
             ea = abs((p - p_velho) / p) * 100
             erro_str = f"{ea:.6f}%"
 
-        # Impressão da linha (Issue #2)
-        print(f"{iteracao:<5} | {a:<12.6f} | {b:<12.6f} | {p:<12.6f} | {fp:<12.6f} | {erro_str:<10}")
+        linha = f"{iteracao:<5} | {a:<12.6f} | {b:<12.6f} | {p:<12.6f} | {fp:<12.6f} | {erro_str:<10}"
+        print(linha)
+        linhas_log.append(linha)
 
-        # 3. Critério de Parada por Erro (Issue #2)
+        # 3. Critério de Parada por Erro
         if p_velho is not None and ea < es:
-            print("-" * 85)
-            print(f"Critério de parada atingido: Ea ({ea:.6f}%) < Es ({es:.6f}%)")
+            msg_parada = "-" * 85 + "\n"
+            msg_parada += f"Critério de parada atingido: Ea ({ea:.6f}%) < Es ({es:.6f}%)"
+            print(msg_parada)
+            linhas_log.append(msg_parada)
+            
+            # Salvar no arquivo (Issue #4)
+            salvar_resultados(linhas_log, p)
             return p
 
-        # Lógica de substituição (Issue #1)
+        # Lógica de substituição
         if f(a) * fp > 0:
             a = p
         else:
@@ -73,17 +85,37 @@ def resolver_bisseccao(a, b, es, n0):
         
         p_velho = p
 
-    # Caso atinja N0 sem atingir Es (Issue #3)
-    print("-" * 85)
-    print(f"AVISO: O limite máximo de {n0} iterações foi atingido sem satisfazer a tolerância Es.")
+    # Caso atinja N0 sem atingir Es
+    msg_aviso = "-" * 85 + "\n"
+    msg_aviso += f"AVISO: O limite máximo de {n0} iterações foi atingido sem satisfazer a tolerância Es."
+    print(msg_aviso)
+    linhas_log.append(msg_aviso)
+    
+    # Salvar no arquivo mesmo se não atingir Es (Issue #4)
+    salvar_resultados(linhas_log, p)
     return p
+
+def salvar_resultados(linhas, resultado_final):
+    """
+    Função auxiliar para gravar os resultados em arquivo (Issue #4).
+    """
+    try:
+        with open("resultados_tabela.txt", "w", encoding="utf-8") as f_out:
+            f_out.write("RELATÓRIO DE EXECUÇÃO - MÉTODO DA BISSECÇÃO\n")
+            f_out.write("PROJETO CIRCUITO RLC - CÁLCULO NUMÉRICO\n")
+            f_out.write("\n".join(linhas))
+            f_out.write("\n" + "=" * 85 + "\n")
+            f_out.write(f"Resultado final aproximado para R: {resultado_final:.6f} Ohms\n")
+            f_out.write("=" * 85 + "\n")
+        print(f"\n[INFO] Resultados salvos com sucesso em 'resultados_tabela.txt'")
+    except Exception as e:
+        print(f"\n[ERRO] Falha ao salvar o arquivo de resultados: {e}")
 
 if __name__ == "__main__":
     print("TRABALHO DE CÁLCULO NUMÉRICO - IFMT")
-    print("MÉTODO DA BISSECÇÃO - CIRCUITO RLC (FASE 1 CONCLUÍDA)\n")
+    print("MÉTODO DA BISSECÇÃO - CIRCUITO RLC\n")
     
     try:
-        # Entradas de dados (Issues #1, #2 e #3)
         limite_a = float(input("Digite o limite inferior (a): "))
         limite_b = float(input("Digite o limite superior (b): "))
         tolerancia_es = float(input("Digite a tolerância desejada (Es %): "))

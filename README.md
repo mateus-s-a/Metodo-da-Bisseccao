@@ -64,8 +64,20 @@ $\mathcal{E}_a = \left| \frac{x_r^{novo} - x_r^{velho}}{x_r^{novo}} \right| \tim
    ```bash
    python bisseccao_circuito_rlc.py
    ```
-5. Durante a execução, as validações de segurança solicitarão a entrada dos limites de intervalo `[a, b]` previamente descobertos pelo grupo (que satisfazem a restrição $f(a) \times f(b) < 0$), o limite máximo de iterações $N_0$ e a tolerância do erro relativo $\mathcal{E}_s$.
-6. O console irá gerar visualmente a tabela da solução e os dados processados serão armazenados para conferência.
+5. Durante a execução, o programa solicitará os seguintes parâmetros:
+   - **Limite inferior (a)**: Extremidade esquerda do intervalo.
+   - **Limite superior (b)**: Extremidade direita do intervalo.
+   - **Tolerância (Es %)**: O erro relativo percentual aceitável para parada.
+   - **Máximo de iterações (N0)**: Trava de segurança para evitar loops infinitos.
+
+### Exemplo Prático de Execução
+Para testar o algoritmo com valores validados pelo grupo, utilize as seguintes entradas:
+- **a**: `320`
+- **b**: `330`
+- **Es**: `0.01`
+- **N0**: `100`
+
+6. O console irá gerar visualmente a tabela da solução e os dados processados serão armazenados automaticamente no arquivo [`resultados_tabela.txt`](resultados_tabela.txt) para conferência posterior.
 
 ### Google Colab (ainda não realizado)
 
