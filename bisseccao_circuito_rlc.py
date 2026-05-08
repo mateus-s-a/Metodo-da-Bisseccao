@@ -1,7 +1,16 @@
 import math
+import os
+
+# Tentar importar bibliotecas de visualização
+try:
+    import matplotlib.pyplot as plt
+    import numpy as np
+    VISUALIZACAO_DISPONIVEL = True
+except ImportError:
+    VISUALIZACAO_DISPONIVEL = False
 
 # =============================================================================
-# [ISSUE #1] CONSTANTES E FUNÇÃO DO CIRCUITO RLC
+# CONSTANTES E FUNÇÃO DO CIRCUITO RLC
 # =============================================================================
 L = 5.0      # Indutância (H)
 C = 1e-4     # Capacitância (F)
@@ -11,12 +20,15 @@ ALVO = 0.01  # q(t)/q0 = 1%
 def f(R):
     """
     Calcula o valor da função f(R) baseada na equação do circuito RLC.
-    Modelagem matemática designada para a Issue #1.
     """
-    # f(R) = e^(-R*t/(2L)) * cos(sqrt(1/(LC) - (R/(2L))^2) * t) - 0.01
     termo_exponencial = math.exp(-(R / (2 * L)) * T)
-    frequencia = math.sqrt((1 / (L * C)) - (R / (2 * L))**2)
     
+    # Proteção contra valores de R que tornariam a frequência imaginária
+    frequencia_interna = (1 / (L * C)) - (R / (2 * L))**2
+    if frequencia_interna < 0:
+        return float('inf')
+        
+    frequencia = math.sqrt(frequencia_interna)
     return termo_exponencial * math.cos(frequencia * T) - ALVO
 
 def resolver_bisseccao(a, b, es, n0):
@@ -39,8 +51,10 @@ def resolver_bisseccao(a, b, es, n0):
         print(msg_erro)
         return None
     
-    # Preparação para gravação em arquivo (Issue #4)
+    # Preparação para gravação em arquivo e gráfico
     linhas_log = []
+    historico_p = []
+    historico_fp = []
     
     cabecalho_tab = "\n" + "="*85 + "\n"
     cabecalho_tab += f"{'Iter':<5} | {'a':<12} | {'b':<12} | {'p':<12} | {'f(p)':<12} | {'Erro (%)':<10}\n"
@@ -55,6 +69,10 @@ def resolver_bisseccao(a, b, es, n0):
     for iteracao in range(1, n0 + 1):
         p = (a + b) / 2
         fp = f(p)
+        
+        # Coleta de dados para o gráfico
+        historico_p.append(p)
+        historico_fp.append(fp)
         
         ea = 0
         erro_str = "---"
@@ -75,6 +93,8 @@ def resolver_bisseccao(a, b, es, n0):
             
             # Salvar no arquivo (Issue #4)
             salvar_resultados(linhas_log, p)
+            if VISUALIZACAO_DISPONIVEL:
+                gerar_grafico(historico_p, historico_fp, p)
             return p
 
         # Lógica de substituição
@@ -93,7 +113,42 @@ def resolver_bisseccao(a, b, es, n0):
     
     # Salvar no arquivo mesmo se não atingir Es (Issue #4)
     salvar_resultados(linhas_log, p)
+    if VISUALIZACAO_DISPONIVEL:
+        gerar_grafico(historico_p, historico_fp, p)
     return p
+
+def gerar_grafico(historico_p, historico_fp, raiz_final):
+    """
+    Gera o gráfico de convergência (PNG).
+    """
+    print("\n[INFO] Gerando gráfico de convergência...")
+    
+    p_min, p_max = min(historico_p), max(historico_p)
+    margem = (p_max - p_min) * 0.5 if p_max != p_min else 10
+    r_range = np.linspace(p_min - margem, p_max + margem, 500)
+    
+    f_vec = np.vectorize(f)
+    y_range = f_vec(r_range)
+    
+    plt.figure(figsize=(10, 6))
+    plt.plot(r_range, y_range, label='f(R)', color='#2c3e50', linewidth=2)
+    plt.axhline(0, color='red', linestyle='--', alpha=0.5)
+    
+    # Plotar os pontos de cada iteração
+    plt.scatter(historico_p, historico_fp, color='#3498db', alpha=0.6, label='Pontos Médios (p)')
+    
+    # Destacar a raiz final
+    plt.scatter([raiz_final], [f(raiz_final)], color='#e74c3c', s=120, marker='*', label=f'Raiz Final: {raiz_final:.4f} Ohms', zorder=5)
+    
+    plt.title('Visualização Técnica: Método da Bissecção (Circuito RLC)')
+    plt.xlabel('Resistência R (Ohms)')
+    plt.ylabel('Valor de f(R)')
+    plt.grid(True, linestyle=':', alpha=0.6)
+    plt.legend()
+    
+    plt.savefig("grafico_convergencia.png")
+    plt.close()
+    print("[INFO] Arquivo 'grafico_convergencia.png' gerado com sucesso.")
 
 def salvar_resultados(linhas, resultado_final):
     """
@@ -114,6 +169,9 @@ def salvar_resultados(linhas, resultado_final):
 if __name__ == "__main__":
     print("TRABALHO DE CÁLCULO NUMÉRICO - IFMT")
     print("MÉTODO DA BISSECÇÃO - CIRCUITO RLC\n")
+    
+    if not VISUALIZACAO_DISPONIVEL:
+        print("[AVISO] Bibliotecas de visualização não encontradas. O gráfico não será gerado.\n")
     
     try:
         limite_a = float(input("Digite o limite inferior (a): "))
