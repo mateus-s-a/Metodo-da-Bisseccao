@@ -3,7 +3,9 @@ import os
 
 # Tentar importar bibliotecas de visualização
 try:
+    # pyrefly: ignore [missing-import]
     import matplotlib.pyplot as plt
+    # pyrefly: ignore [missing-import]
     import numpy as np
     VISUALIZACAO_DISPONIVEL = True
 except ImportError:
@@ -42,11 +44,11 @@ def resolver_bisseccao(a, b, es, n0):
     
     if fa * fb >= 0:
         msg_erro = (
-            "\n" + "!"*85 + "\n" +
-            f"ERRO DE ENTRADA: f({a}) * f({b}) = {fa*fb:.6f}\n" +
+            "\n" + "!"*120 + "\n" +
+            f"ERRO DE ENTRADA: f({a}) * f({b}) = {fa*fb:.9f}\n" +
             "O Método da Bissecção requer que a função mude de sinal no intervalo [a, b].\n" +
             "Tente um intervalo diferente onde f(a) * f(b) < 0.\n" +
-            "!"*85 + "\n"
+            "!"*120 + "\n"
         )
         print(msg_erro)
         return None
@@ -56,9 +58,9 @@ def resolver_bisseccao(a, b, es, n0):
     historico_p = []
     historico_fp = []
     
-    cabecalho_tab = "\n" + "="*85 + "\n"
-    cabecalho_tab += f"{'Iter':<5} | {'a':<12} | {'b':<12} | {'p':<12} | {'f(p)':<12} | {'Erro (%)':<10}\n"
-    cabecalho_tab += "-" * 85
+    cabecalho_tab = "\n" + "="*120 + "\n"
+    cabecalho_tab += f"{'Iter':<5} | {'a':<13} | {'b':<13} | {'p':<13} | {'f(a)':<13} | {'f(b)':<11} | {'f(p)':<12} | {'Erro (%)':<11}\n"
+    cabecalho_tab += "-" * 120
     
     print(cabecalho_tab)
     linhas_log.append(cabecalho_tab)
@@ -68,26 +70,31 @@ def resolver_bisseccao(a, b, es, n0):
     # 2. Laço de repetição com trava de segurança N0
     for iteracao in range(1, n0 + 1):
         p = (a + b) / 2
+        fa = f(a)
+        fb = f(b)
         fp = f(p)
         
         # Coleta de dados para o gráfico
         historico_p.append(p)
         historico_fp.append(fp)
         
+        # 3. Cálculo do erro percentual aproximado (ea)
         ea = 0
         erro_str = "---"
         if p_velho is not None:
+            # |(p - p_velho) / p| × 100
             ea = abs((p - p_velho) / p) * 100
-            erro_str = f"{ea:.6f}%"
+            erro_str = f"{ea:.9f}%"
 
-        linha = f"{iteracao:<5} | {a:<12.6f} | {b:<12.6f} | {p:<12.6f} | {fp:<12.6f} | {erro_str:<10}"
+        # 4. Formatação da Linha da Tabela
+        linha = f"{iteracao:<5} | {a:<12.9f} | {b:<12.9f} | {p:<12.9f} | {fa:<12.9f} | {fb:<12.9f} | {fp:<12.9f} | {erro_str:<10}"
         print(linha)
         linhas_log.append(linha)
 
-        # 3. Critério de Parada por Erro
+        # 5. Critério de Parada por Erro
         if p_velho is not None and ea < es:
-            msg_parada = "-" * 85 + "\n"
-            msg_parada += f"Critério de parada atingido: Ea ({ea:.6f}%) < Es ({es:.6f}%)"
+            msg_parada = "-" * 120 + "\n"
+            msg_parada += f"Critério de parada atingido: Ea ({ea:.9f}%) < Es ({es:.9f}%)"
             print(msg_parada)
             linhas_log.append(msg_parada)
             
@@ -183,7 +190,7 @@ if __name__ == "__main__":
         
         if resultado is not None:
             print("=" * 85)
-            print(f"Resultado final aproximado para R: {resultado:.6f} Ohms")
+            print(f"Resultado final aproximado para R: {resultado:.9f} Ohms")
             print("=" * 85)
             
     except ValueError:
