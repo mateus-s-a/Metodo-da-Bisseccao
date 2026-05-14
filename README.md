@@ -1,6 +1,7 @@
 # Trabalho de Cálculo Numérico: Dimensionamento de Resistor em Circuito RLC
 
 **Data da Apresentação:** 14/05/2026
+
 **Equipe de Desenvolvimento:**
 * Mateus de Souza Arruda
 * Rayssa Conceição Santiago
