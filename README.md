@@ -143,14 +143,14 @@ O algoritmo compara o valor de $\mathcal{E}_a$ com a tolerância $\mathcal{E}_s$
 
 ### Exemplo Prático de Execução
 Para testar o algoritmo com valores validados pelo grupo, utilize as seguintes entradas:
-- **a**: `320`
-- **b**: `330`
-- **Es**: `0.01`
-- **N0**: `100`
+- **a**: $300$
+- **b**: $400$
+- **Es**: $0,001$
+- **N0**: $100$
 
 6. O console irá gerar visualmente a tabela da solução e os dados processados serão armazenados automaticamente no arquivo [`resultados_tabela.txt`](resultados_tabela.txt) para conferência posterior.
 
-### Google Colab (ainda não realizado)
+### Google Colab
 
 1. Acesse o [Google Colab](https://colab.research.google.com/).
 2. Clique em "Arquivo" > "Upload de notebook".
@@ -158,7 +158,7 @@ Para testar o algoritmo com valores validados pelo grupo, utilize as seguintes e
 4. Siga os mesmos passos de execução do terminal.
 
 ## Resultados e Conclusão
-Após a execução e a integração dos módulos desenvolvidos pelo grupo, utilizamos o intervalo validado manualmente de `[a, b] = [INSERIR_EXTREMO_A, INSERIR_EXTREMO_B]` juntamente com uma tolerância programada estrita. O critério de Erro Relativo foi alcançado com sucesso na iteração número `[INSERIR_NUMERO_DA_ITERACAO_FINAL]`.
+Após a execução e a integração dos módulos desenvolvidos pelo grupo, utilizamos o intervalo validado manualmente de $[a, b] = [300, 400]$ juntamente com uma tolerância programada estrita. O critério de Erro Relativo Percentual Aproximado de $\mathcal{E}_s = 0,001\%$ foi alcançado com sucesso na iteração número $15$.
 
 O valor final determinado para o resistor do circuito, para que a carga de dissipação do capacitor cumpra a exigência de ser $1\%$ do seu original após $0,05$ segundos, convergiu com segurança para:
-**$R \approx$ `[INSERIR_VALOR_FINAL_DE_R]` Ohms**.
+$$R \approx 328,152466 \text{ Ohms}$$
